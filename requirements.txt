@@ -1,1 +1,2 @@
-pyxattr
+pycairo
+PyGObject

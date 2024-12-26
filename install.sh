@@ -2,6 +2,10 @@
 
 echo "Installing Nautilus Hash Check Extension..."
 
+# Install Python packages
+echo "Installing Python dependencies..."
+pip3 install --user -r requirements.txt
+
 # Copy the script to the Nautilus extensions directory
 EXT_DIR="$HOME/.local/share/nautilus-python/extensions"
 mkdir -p "$EXT_DIR"
@@ -16,8 +20,5 @@ cp assets/emblem-shield.icon "$ICON_DIR"
 # Update the icon cache
 echo "Updating icon cache..."
 gtk-update-icon-cache "$HOME/.icons"
-
-# installing python packages
-pip3 install -r requirements.txt
 
 echo "Installation complete. Restart Nautilus to activate the extension."

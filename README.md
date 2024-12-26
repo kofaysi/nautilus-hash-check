@@ -54,5 +54,14 @@ To remove the extension, run:
 ./uninstall.sh
 ```
 
+## Customization
+
+The `assets/` folder contains the source file `green-check-icon.svg`, which was used to generate the `emblem-shield.png` file. You can modify the SVG and regenerate the PNG using a tool like Inkscape:
+
+```bash
+inkscape -w 48 -h 48 -o emblem-shield.png green-check-icon.svg
+```
+After modifying the icon, run the install.sh script again to update the installation.
+
 ## License
 MIT

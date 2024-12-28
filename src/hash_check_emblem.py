@@ -28,12 +28,19 @@ VALIDATION_LOCK = threading.Lock()  # Thread lock for validation tracking
 # Name of the emblem to apply
 EMBLEM_NAME = "emblem-shield"
 
+# Global flag to control debug logging
+ENABLE_DEBUG_LOGGING = False  # Set to False to disable logging
+
 def log_debug_message(folder_path, message):
-    """Log debug messages to a global debug file with timestamps."""
+    """Log debug messages to a global debug file with timestamps if logging is enabled."""
+    if not ENABLE_DEBUG_LOGGING:
+        return  # Skip logging if disabled
+
     from datetime import datetime
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(DEBUG_FILE, "a") as f:
         f.write(f"[{timestamp}] {folder_path}: {message}\n")
+
 
 def calculate_file_hash(file_path, hash_function):
     """Calculate the hash of a file using the specified hash function."""

@@ -6,9 +6,9 @@ EXT_DIR="$HOME/.local/share/nautilus-python/extensions"
 ICON_DIR="$HOME/.icons/hicolor/48x48/emblems"
 
 # Remove the extension script
-if [ -f "$EXT_DIR/nautilus_hash_check.py" ]; then
+if [ -f "$EXT_DIR/hash_check_emblem.py" ]; then
     echo "Removing Nautilus Hash Check script..."
-    rm -f "$EXT_DIR/nautilus_hash_check.py"
+    rm -f "$EXT_DIR/hash_check_emblem.py"
 else
     echo "Nautilus Hash Check script not found in $EXT_DIR."
 fi

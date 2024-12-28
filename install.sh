@@ -9,7 +9,7 @@ pip3 install --user -r requirements.txt
 # Copy the script to the Nautilus extensions directory
 EXT_DIR="$HOME/.local/share/nautilus-python/extensions"
 mkdir -p "$EXT_DIR"
-cp src/nautilus_hash_check.py "$EXT_DIR"
+cp src/hash_check_emblem.py "$EXT_DIR"
 
 # Copy the emblem files to the local icons directory
 ICON_DIR="$HOME/.icons/hicolor/48x48/emblems"

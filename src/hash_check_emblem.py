@@ -2,6 +2,7 @@ import os
 import hashlib
 import threading
 import subprocess
+import time
 import gi
 
 gi.require_version('Nautilus', '3.0')
@@ -19,7 +20,10 @@ HASH_FUNCTIONS = {
 }
 
 DEBUG_FILE = "/tmp/debug_output.txt"
-VERIFICATION_CACHE = {}  # Cache: {file_path: last_verification_time}
+VALIDATION_IN_PROGRESS = set()  # Set of files currently being validated
+VALIDATION_CACHE = {}  # Cache: {file_path: last_validation_timestamp}
+CACHE_EXPIRY_SECONDS = 10  # Time to skip re-validation for the same file
+VALIDATION_LOCK = threading.Lock()  # Thread lock for validation tracking
 
 # Name of the emblem to apply
 EMBLEM_NAME = "emblem-shield"
@@ -61,6 +65,12 @@ def is_emblem_applied(file_path, emblem_name):
         log_debug_message(os.path.dirname(file_path), f"Error checking emblem for {file_path}: {e}")
     return False
 
+def is_recently_validated(file_path):
+    """Check if the file was recently validated."""
+    now = time.time()
+    last_validated = VALIDATION_CACHE.get(file_path, 0)
+    return (now - last_validated) < CACHE_EXPIRY_SECONDS
+
 def validate_file(file_path, hash_file, debug_folder):
     """Validate the file's hash against the hash file."""
     try:
@@ -89,6 +99,38 @@ def validate_file(file_path, hash_file, debug_folder):
         log_debug_message(debug_folder, f"Error validating {file_path}: {e}")
     return False
 
+
+def validate_file_with_tracking(file_path, hash_file, debug_folder):
+    """Validate the file with tracking to avoid redundant validations."""
+    with VALIDATION_LOCK:
+        if file_path in VALIDATION_IN_PROGRESS:
+            log_debug_message(debug_folder, f"Validation already in progress for {file_path}")
+            return False
+
+        if is_recently_validated(file_path):
+            log_debug_message(debug_folder, f"Skipping recently validated file: {file_path}")
+            return False
+
+        VALIDATION_IN_PROGRESS.add(file_path)
+
+    try:
+        # Perform validation
+        if validate_file(file_path, hash_file, debug_folder):
+            # Update the validation cache on success
+            with VALIDATION_LOCK:
+                VALIDATION_CACHE[file_path] = time.time()
+
+            # Apply the emblem to the validated file
+            apply_emblem(file_path)
+            return True
+    finally:
+        # Remove the file from the in-progress set
+        with VALIDATION_LOCK:
+            VALIDATION_IN_PROGRESS.remove(file_path)
+
+    return False
+
+
 def apply_emblem(file_path):
     """Apply an emblem to the file."""
     try:
@@ -110,6 +152,7 @@ class HashOverlayProvider(GObject.GObject, Nautilus.InfoProvider):
 
         # Ignore non-hash files
         if not any(file_path.endswith(ext) for ext in HASH_FILE_EXTENSIONS):
+            # The file is not a hashfile
             return
 
         folder_path = os.path.dirname(file_path)
@@ -129,8 +172,7 @@ class HashOverlayProvider(GObject.GObject, Nautilus.InfoProvider):
                                 log_debug_message(folder_path, f"Skipping {target_file_path} (emblem already applied)")
                                 continue
 
-                            if validate_file(target_file_path, file_path, folder_path):
-                                apply_emblem(target_file_path)
+                            validate_file_with_tracking(target_file_path, file_path, folder_path)
                         else:
                             log_debug_message(folder_path, f"Target file not found: {target_filename}")
                     except ValueError:

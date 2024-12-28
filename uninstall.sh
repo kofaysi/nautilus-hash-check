@@ -3,7 +3,9 @@
 # Uninstall the Nautilus Hash Check Extension
 
 EXT_DIR="$HOME/.local/share/nautilus-python/extensions"
-ICON_DIR="$HOME/.icons/hicolor/48x48/emblems"
+EMBLEMS_DIR="$HOME/.icons/hicolor/48x48/emblems"
+ICONS_DIR="$HOME/.icons"
+
 
 # Remove the extension script
 if [ -f "$EXT_DIR/hash_check_emblem.py" ]; then
@@ -14,19 +16,26 @@ else
 fi
 
 # Remove the emblem files
-if [ -f "$ICON_DIR/emblem-shield.png" ]; then
+if [ -f "$EMBLEMS_DIR/emblem-shield.png" ]; then
     echo "Removing emblem PNG..."
-    rm -f "$ICON_DIR/emblem-shield.png"
+    rm -f "$EMBLEMS_DIR/emblem-shield.png"
 fi
 
-if [ -f "$ICON_DIR/emblem-shield.icon" ]; then
+if [ -f "$EMBLEMS_DIR/emblem-shield.icon" ]; then
     echo "Removing emblem ICON..."
-    rm -f "$ICON_DIR/emblem-shield.icon"
+    rm -f "$EMBLEMS_DIR/emblem-shield.icon"
 fi
 
-# Remove the directories if they are empty (including all empty parent directories)
+# Recursive cleanup of empty directories
+cleanup_empty_dirs() {
+    for dir in "$@"; do
+        find "$dir" -depth -type d -empty -delete
+    done
+}
+
 echo "Cleaning up empty directories..."
-find "$EXT_DIR" "$ICON_DIR" -type d -empty -delete 2>/dev/null
+cleanup_empty_dirs "$EXT_DIR" "$ICONS_DIR"
+echo "Empty directories cleaned up."
 
 # Update the icon cache
 if [ -d "$HOME/.icons" ]; then

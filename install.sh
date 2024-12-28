@@ -22,3 +22,16 @@ echo "Updating icon cache..."
 gtk-update-icon-cache "$HOME/.icons"
 
 echo "Installation complete. Restart Nautilus to activate the extension."
+
+# Prompt the user to restart Nautilus
+read -p "Do you want to restart Nautilus now? [Y/n] " response
+response=${response,,}  # Convert to lowercase
+
+if [[ "$response" == "y" || "$response" == "" ]]; then
+    echo "Restarting Nautilus..."
+    pkill nautilus
+    nohup nautilus >/dev/null 2>&1 &
+    echo "Nautilus has been restarted."
+else
+    echo "Please restart Nautilus manually to activate the extension."
+fi

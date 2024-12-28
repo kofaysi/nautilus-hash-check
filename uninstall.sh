@@ -24,6 +24,10 @@ if [ -f "$ICON_DIR/emblem-shield.icon" ]; then
     rm -f "$ICON_DIR/emblem-shield.icon"
 fi
 
+# Remove the directories if they are empty (including all empty parent directories)
+echo "Cleaning up empty directories..."
+find "$EXT_DIR" "$ICON_DIR" -type d -empty -delete 2>/dev/null
+
 # Update the icon cache
 if [ -d "$HOME/.icons" ]; then
     echo "Updating icon cache..."
@@ -35,3 +39,15 @@ fi
 # Notify the user
 echo "Uninstallation complete. Please restart Nautilus if it is running."
 
+# Prompt the user to restart Nautilus
+read -p "Do you want to restart Nautilus now? [Y/n] " response
+response=${response,,}  # Convert to lowercase
+
+if [[ "$response" == "y" || "$response" == "" ]]; then
+    echo "Restarting Nautilus..."
+    pkill nautilus
+    nohup nautilus >/dev/null 2>&1 &
+    echo "Nautilus has been restarted."
+else
+    echo "Please restart Nautilus manually to finalize the uninstallation."
+fi

@@ -19,7 +19,10 @@ HASH_FUNCTIONS = {
     "sha512": hashlib.sha512,
 }
 
-DEBUG_FILE = "/tmp/debug_output.txt"
+# Define a unique debug file path based on the script name
+SCRIPT_NAME = os.path.basename(__file__).replace('.py', '')
+DEBUG_FILE = f"/tmp/{SCRIPT_NAME}_debug.log"
+
 VALIDATION_IN_PROGRESS = set()  # Set of files currently being validated
 VALIDATION_CACHE = {}  # Cache: {file_path: last_validation_timestamp}
 CACHE_EXPIRY_SECONDS = 10  # Time to skip re-validation for the same file

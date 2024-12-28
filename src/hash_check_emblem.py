@@ -104,11 +104,11 @@ def validate_file_with_tracking(file_path, hash_file, debug_folder):
     """Validate the file with tracking to avoid redundant validations."""
     with VALIDATION_LOCK:
         if file_path in VALIDATION_IN_PROGRESS:
-            log_debug_message(debug_folder, f"Validation already in progress for {file_path}")
+            log_debug_message(debug_folder, f"Skipping {file_path} (validation already in progress)")
             return False
 
         if is_recently_validated(file_path):
-            log_debug_message(debug_folder, f"Skipping recently validated file: {file_path}")
+            log_debug_message(debug_folder, f"Skipping {file_path} (recently validated)")
             return False
 
         VALIDATION_IN_PROGRESS.add(file_path)

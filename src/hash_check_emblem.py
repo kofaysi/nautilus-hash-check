@@ -1,7 +1,6 @@
 import os
 import hashlib
 import threading
-import subprocess
 import time
 import gi
 
@@ -32,7 +31,7 @@ VALIDATION_LOCK = threading.Lock()  # Thread lock for validation tracking
 EMBLEM_NAME = "emblem-shield"
 
 # Global flag to control debug logging
-ENABLE_DEBUG_LOGGING = False  # Set to False to disable logging
+ENABLE_DEBUG_LOGGING = True  # Set to False to disable logging
 
 def log_debug_message(folder_path, message):
     """Log debug messages to a global debug file with timestamps if logging is enabled."""
@@ -43,7 +42,6 @@ def log_debug_message(folder_path, message):
     timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     with open(DEBUG_FILE, "a") as f:
         f.write(f"[{timestamp}] {folder_path}: {message}\n")
-
 
 def calculate_file_hash(file_path, hash_function):
     """Calculate the hash of a file using the specified hash function."""
@@ -56,24 +54,6 @@ def get_hash_function(hash_file_extension):
     # Strip the ".sum" suffix to get the hash core (e.g., "md5", "sha1")
     hash_core = hash_file_extension.lstrip(".").replace("sum", "")
     return HASH_FUNCTIONS.get(hash_core)
-
-def is_emblem_applied(file_path, emblem_name):
-    """Check if the specified emblem is already applied to the file."""
-    try:
-        result = subprocess.run(
-            ["gio", "info", "-a", "metadata::emblems", file_path],
-            stdout=subprocess.PIPE,
-            text=True,
-            check=True,
-        )
-        for line in result.stdout.splitlines():
-            if ": " in line and line.lstrip().startswith("metadata::emblems:"):
-                emblems = line.split(": ", 1)[1].strip().strip("[]").split(", ")
-                if emblem_name in emblems:
-                    return True
-    except subprocess.CalledProcessError as e:
-        log_debug_message(os.path.dirname(file_path), f"Error checking emblem for {file_path}: {e}")
-    return False
 
 def is_recently_validated(file_path):
     """Check if the file was recently validated."""
@@ -109,8 +89,7 @@ def validate_file(file_path, hash_file, debug_folder):
         log_debug_message(debug_folder, f"Error validating {file_path}: {e}")
     return False
 
-
-def validate_file_with_tracking(file_path, hash_file, debug_folder):
+def validate_file_with_tracking(file_path, hash_file, debug_folder, file_info):
     """Validate the file with tracking to avoid redundant validations."""
     with VALIDATION_LOCK:
         if file_path in VALIDATION_IN_PROGRESS:
@@ -131,7 +110,9 @@ def validate_file_with_tracking(file_path, hash_file, debug_folder):
                 VALIDATION_CACHE[file_path] = time.time()
 
             # Apply the emblem to the validated file
-            apply_emblem(file_path)
+            log_debug_message(debug_folder, f"Pre: Emblem applied to {file_info}")
+            file_info.add_emblem(EMBLEM_NAME)
+            log_debug_message(debug_folder, f"Emblem applied to {file_path}")
             return True
     finally:
         # Remove the file from the in-progress set
@@ -140,37 +121,25 @@ def validate_file_with_tracking(file_path, hash_file, debug_folder):
 
     return False
 
-
-def apply_emblem(file_path):
-    """Apply an emblem to the file."""
-    try:
-        log_debug_message(os.path.dirname(file_path), f"Applying emblem '{EMBLEM_NAME}' to {file_path}")
-        subprocess.run(
-            ["gio", "set", "-t", "stringv", file_path, "metadata::emblems", EMBLEM_NAME],
-            check=True,
-        )
-    except subprocess.CalledProcessError as e:
-        log_debug_message(os.path.dirname(file_path), f"Error applying emblem to {file_path}: {e}")
-
 class HashOverlayProvider(GObject.GObject, Nautilus.InfoProvider):
     def update_file_info(self, file):
         """Update file info in Nautilus."""
         if file.get_uri_scheme() != "file":
             return
 
-        file_path = file.get_location().get_path()
+        hash_file_path = file.get_location().get_path()
 
         # Ignore non-hash files
-        if not any(file_path.endswith(ext) for ext in HASH_FILE_EXTENSIONS):
+        if not any(hash_file_path.endswith(ext) for ext in HASH_FILE_EXTENSIONS):
             # The file is not a hashfile
             return
 
-        folder_path = os.path.dirname(file_path)
+        folder_path = os.path.dirname(hash_file_path)
 
         # Run hash validation in a separate thread
         def validate_and_process():
-            log_debug_message(folder_path, f"Processing hash file: {file_path}")
-            with open(file_path, "r") as f:
+            log_debug_message(folder_path, f"Processing hash file: {hash_file_path}")
+            with open(hash_file_path, "r") as f:
                 for line in f:
                     try:
                         hash_value, target_filename = line.strip().split("  ", 1)
@@ -178,14 +147,22 @@ class HashOverlayProvider(GObject.GObject, Nautilus.InfoProvider):
 
                         if os.path.exists(target_file_path):
                             # Skip files that already have the emblem
-                            if is_emblem_applied(target_file_path, EMBLEM_NAME):
-                                log_debug_message(folder_path, f"Skipping {target_file_path} (emblem already applied)")
-                                continue
+                            log_debug_message(folder_path, f"Pre: Emblems of {target_file_path}: ")
+                            try:
+                                #todo: issue: file points to the hash_file and not to the target!
+                                emblems = file.get_string_attribute("metadata::emblems")
+                                log_debug_message(folder_path, f"Emblems of {target_file_path}: {emblems}")
+                                if emblems and EMBLEM_NAME in emblems:
+                                    log_debug_message(folder_path,
+                                                      f"Skipping {target_file_path} (emblem already applied)")
+                                    return
+                            except Exception as e:
+                                log_debug_message(folder_path, f"Error retrieving emblems for {target_file_path}: {e}")
 
-                            validate_file_with_tracking(target_file_path, file_path, folder_path)
+                            validate_file_with_tracking(target_file_path, hash_file_path, folder_path, file)
                         else:
                             log_debug_message(folder_path, f"Target file not found: {target_filename}")
                     except ValueError:
-                        log_debug_message(folder_path, f"Malformed line in {file_path}: {line.strip()}")
+                        log_debug_message(folder_path, f"Malformed line in {hash_file_path}: {line.strip()}")
 
         threading.Thread(target=validate_and_process, daemon=True).start()

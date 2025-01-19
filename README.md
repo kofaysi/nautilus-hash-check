@@ -63,6 +63,13 @@ The `assets/` folder contains the source file `green-check-icon.svg`, which was 
 inkscape -w 48 -h 48 -o emblem-hash-verified.png --export-page=1 emblem-shield.svg  
 inkscape -w 48 -h 48 -o emblem-hash-error.png --export-page=2 emblem-shield.svg
 ```
+also
+
+```bash
+flatpak run org.inkscape.Inkscape -w 48 -h 48 -o emblem-hash-verified.png --export-page=1 emblem-shield.svg  
+flatpak run org.inkscape.Inkscape -w 48 -h 48 -o emblem-hash-error.png --export-page=2 emblem-shield.svg
+```
+
 After modifying the icon, run the install.sh script again to update the installation.
 
 ## License

@@ -1,6 +1,6 @@
 # Nautilus Hash Check
 
-This script validates file hashes (MD5, SHA256) and adds emblems to files in Nautilus.
+This script validates file hashes (MD5, SHA256, SHA1, SHA512) and adds emblems to files in Nautilus.
 
 ## Features
 - Validates hashes using `.md5sum`, `.sha256sum`, `.sha1sum` and `.sha512sum` files.

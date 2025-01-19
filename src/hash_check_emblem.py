@@ -33,7 +33,7 @@ VERIFIED_EMBLEM = "emblem-hash-verified"
 FAILED_EMBLEM = "emblem-hash-error"
 
 # Global flag to control debug logging
-ENABLE_DEBUG_LOGGING = True  # Set to False to disable logging
+ENABLE_DEBUG_LOGGING = False  # Set to False to disable logging
 
 def log_debug_message(folder_path, message):
     """Log debug messages to a global debug file with timestamps if logging is enabled."""

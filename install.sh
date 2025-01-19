@@ -14,8 +14,10 @@ cp src/hash_check_emblem.py "$EXT_DIR"
 # Copy the emblem files to the local icons directory
 ICON_DIR="$HOME/.icons/hicolor/48x48/emblems"
 mkdir -p "$ICON_DIR"
-cp assets/emblem-shield.png "$ICON_DIR"
-cp assets/emblem-shield.icon "$ICON_DIR"
+cp assets/emblem-hash-verified.png "$ICON_DIR"
+cp assets/emblem-hash-verified.icon "$ICON_DIR"
+cp assets/emblem-hash-error.png "$ICON_DIR"
+cp assets/emblem-hash-error.icon "$ICON_DIR"
 
 # Update the icon cache
 echo "Updating icon cache..."

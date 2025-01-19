@@ -3,8 +3,9 @@
 This script validates file hashes (MD5, SHA256) and adds emblems to files in Nautilus.
 
 ## Features
-- Validates hashes using `.md5sum` and `.sha256sum` files.
-- Applies `emblem-shield` to verified files.
+- Validates hashes using `.md5sum`, `.sha256sum`, `.sha1sum` and `.sha512sum` files.
+- Applies `emblem-hash-verified` to verified files. The files are not validate repeatedly.
+- Applies `emblem-hash-error` to verified files. The files may be validated repeatedly.
 
 ## Requirements
 
@@ -60,7 +61,7 @@ The `assets/` folder contains the source file `green-check-icon.svg`, which was 
 
 ```bash
 inkscape -w 48 -h 48 -o emblem-hash-verified.png --export-page=1 emblem-shield.svg  
-inkscape -w 48 -h 48 -o emblem-hash-failed.png --export-page=2 emblem-shield.svg
+inkscape -w 48 -h 48 -o emblem-hash-error.png --export-page=2 emblem-shield.svg
 ```
 After modifying the icon, run the install.sh script again to update the installation.
 

@@ -16,14 +16,24 @@ else
 fi
 
 # Remove the emblem files
-if [ -f "$EMBLEMS_DIR/emblem-shield.png" ]; then
-    echo "Removing emblem PNG..."
-    rm -f "$EMBLEMS_DIR/emblem-shield.png"
+if [ -f "$EMBLEMS_DIR/emblem-hash-verified.png" ]; then
+    echo "Removing emblem-hash-verified PNG..."
+    rm -f "$EMBLEMS_DIR/emblem-hash-verified.png"
 fi
 
-if [ -f "$EMBLEMS_DIR/emblem-shield.icon" ]; then
-    echo "Removing emblem ICON..."
-    rm -f "$EMBLEMS_DIR/emblem-shield.icon"
+if [ -f "$EMBLEMS_DIR/emblem-hash-verified.icon" ]; then
+    echo "Removing emblem-hash-verified ICON..."
+    rm -f "$EMBLEMS_DIR/emblem-hash-verified.icon"
+fi
+
+if [ -f "$EMBLEMS_DIR/emblem-hash-verified.png" ]; then
+    echo "Removing emblem-hash-verified PNG..."
+    rm -f "$EMBLEMS_DIR/emblem-hash-verified.png"
+fi
+
+if [ -f "$EMBLEMS_DIR/emblem-hash-verified.icon" ]; then
+    echo "Removing emblem-hash-verified ICON..."
+    rm -f "$EMBLEMS_DIR/emblem-hash-verified.icon"
 fi
 
 # Recursive cleanup of empty directories

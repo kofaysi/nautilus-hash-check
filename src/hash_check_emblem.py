@@ -33,7 +33,7 @@ VERIFIED_EMBLEM = "emblem-hash-verified"
 FAILED_EMBLEM = "emblem-hash-error"
 
 # Global flag to control debug logging
-ENABLE_DEBUG_LOGGING = False  # Set to False to disable logging
+ENABLE_DEBUG_LOGGING = True  # Set to False to disable logging
 
 def log_debug_message(folder_path, message):
     """Log debug messages to a global debug file with timestamps if logging is enabled."""
@@ -82,67 +82,107 @@ def is_recently_validated(file_path):
     last_validated = VALIDATION_CACHE.get(file_path, 0)
     return (now - last_validated) < CACHE_EXPIRY_SECONDS
 
-def validate_file(file_path, hash_file, debug_folder):
-    """Validate the file's hash against the hash file."""
+def read_hash_file(hash_file_path):
+    """Read and parse the hash file into lines."""
     try:
-        log_debug_message(debug_folder, f"Validating {file_path} using {hash_file}")
-        with open(hash_file, "r") as f:
-            for line in f:
-                try:
-                    hash_value, file_name = line.strip().split("  ", 1)
-                    if os.path.basename(file_path) == file_name:
-                        # Determine the hash function dynamically
-                        hash_func = get_hash_function(os.path.splitext(hash_file)[1])
-                        if not hash_func:
-                            log_debug_message(debug_folder, f"Unsupported hash type in {hash_file}")
-                            return False
-
-                        # Calculate and compare hash
-                        calculated_hash = calculate_file_hash(file_path, hash_func)
-                        if calculated_hash == hash_value:
-                            log_debug_message(debug_folder, f"Hash validated for {file_path}")
-                            # Apply the emblem to the validated file
-                            apply_emblem(file_path, VERIFIED_EMBLEM)
-                            return True
-                        else:
-                            log_debug_message(debug_folder, f"Hash mismatch for {file_path}")
-                            # Apply the emblem to the validated file
-                            apply_emblem(file_path, FAILED_EMBLEM)
-                except ValueError:
-                    log_debug_message(debug_folder, f"Malformed line in {hash_file}: {line.strip()}")
+        with open(hash_file_path, "r") as f:
+            return [line.strip() for line in f.readlines()]
     except Exception as e:
-        log_debug_message(debug_folder, f"Error validating {file_path}: {e}")
+        log_debug_message(os.path.dirname(hash_file_path), f"Error reading {hash_file_path}: {e}")
+        return []
+
+def parse_hash_line(line):
+    """Parse a single line into hash value and file name."""
+    try:
+        hash_value, file_name = line.split("  ", 1)
+        return hash_value, file_name
+    except ValueError:
+        log_debug_message("", f"Malformed line: {line}")
+        return None, None
+
+def validate_hash(file_path, hash_value, hash_function):
+    """Validate a file's hash against the expected value."""
+    try:
+        calculated_hash = calculate_file_hash(file_path, hash_function)
+        return calculated_hash == hash_value
+    except Exception as e:
+        log_debug_message(os.path.dirname(file_path), f"Error validating hash for {file_path}: {e}")
+        return False
+
+def process_validation(file_path, hash_value, hash_function, debug_folder):
+    """Process the validation and apply the appropriate emblem."""
+    if validate_hash(file_path, hash_value, hash_function):
+        log_debug_message(debug_folder, f"Hash validated for {file_path}")
+        apply_emblem(file_path, VERIFIED_EMBLEM)
+        return True
+    else:
+        log_debug_message(debug_folder, f"Hash mismatch for {file_path}")
+
+        # Skip files that already have an FAILED_EMBLEM applied
+        if is_emblem_applied(file_path, FAILED_EMBLEM):
+            log_debug_message(debug_folder, f"Skipping {file_path} (emblem already applied)")
+        else:
+            apply_emblem(file_path, FAILED_EMBLEM)
+        return False
+
+def validate_file(file_path, hash_file_path, debug_folder):
+    """Validate the file's hash against the hash file."""
+    lines = read_hash_file(hash_file_path)
+    for line in lines:
+        hash_value, file_name = parse_hash_line(line)
+        if not hash_value or not file_name:
+            continue
+
+        if os.path.basename(file_path) == file_name:
+            hash_function = get_hash_function(os.path.splitext(hash_file_path)[1])
+            if not hash_function:
+                log_debug_message(debug_folder, f"Unsupported hash type in {hash_file_path}")
+                return False
+
+            return process_validation(file_path, hash_value, hash_function, debug_folder)
+
+    log_debug_message(debug_folder, f"No matching hash entry found for {file_path}")
     return False
 
+def should_validate_file(file_path):
+    """Check if the file should be validated (not in progress and not recently validated)."""
+    with VALIDATION_LOCK:
+        if file_path in VALIDATION_IN_PROGRESS or is_recently_validated(file_path):
+            return False
+    return True
+
+def add_to_in_progress(file_path):
+    """Mark a file as being validated."""
+    with VALIDATION_LOCK:
+        VALIDATION_IN_PROGRESS.add(file_path)
+
+def remove_from_in_progress(file_path):
+    """Remove a file from the in-progress validation set."""
+    with VALIDATION_LOCK:
+        VALIDATION_IN_PROGRESS.discard(file_path)
+
+def update_validation_cache(file_path):
+    """Update the validation cache for a file."""
+    with VALIDATION_LOCK:
+        VALIDATION_CACHE[file_path] = time.time()
 
 def validate_file_with_tracking(file_path, hash_file, debug_folder):
     """Validate the file with tracking to avoid redundant validations."""
-    with VALIDATION_LOCK:
-        if file_path in VALIDATION_IN_PROGRESS:
-            log_debug_message(debug_folder, f"Skipping {file_path} (validation already in progress)")
-            return False
+    if not should_validate_file(file_path):
+        log_debug_message(debug_folder, f"Skipping {file_path} (recently validated or in progress)")
+        return False
 
-        if is_recently_validated(file_path):
-            log_debug_message(debug_folder, f"Skipping {file_path} (recently validated)")
-            return False
-
-        VALIDATION_IN_PROGRESS.add(file_path)
+    add_to_in_progress(file_path)
 
     try:
         # Perform validation
         if validate_file(file_path, hash_file, debug_folder):
-            # Update the validation cache on success
-            with VALIDATION_LOCK:
-                VALIDATION_CACHE[file_path] = time.time()
-
+            update_validation_cache(file_path)
             return True
     finally:
-        # Remove the file from the in-progress set
-        with VALIDATION_LOCK:
-            VALIDATION_IN_PROGRESS.remove(file_path)
+        remove_from_in_progress(file_path)
 
     return False
-
 
 def apply_emblem(file_path, emblem_name):
     """Apply an emblem to the file."""
@@ -155,6 +195,35 @@ def apply_emblem(file_path, emblem_name):
     except subprocess.CalledProcessError as e:
         log_debug_message(os.path.dirname(file_path), f"Error applying emblem to {file_path}: {e}")
 
+def is_supported_hash_file(file_path):
+    """Check if the file has a supported hash file extension."""
+    return any(file_path.endswith(ext) for ext in HASH_FILE_EXTENSIONS)
+
+
+def process_hash_file(hash_file_path, folder_path):
+    """Process a hash file and validate each target file."""
+    lines = read_hash_file(hash_file_path)
+
+    for line in lines:
+        hash_value, target_filename = parse_hash_line(line)
+        if not hash_value or not target_filename:
+            continue
+
+        target_file_path = os.path.join(folder_path, target_filename)
+
+        if not os.path.exists(target_file_path):
+            log_debug_message(folder_path, f"Target file not found: {target_filename}")
+            continue
+
+        # Skip files that already have an VERIFIED_EMBLEM applied
+        if is_emblem_applied(target_file_path, VERIFIED_EMBLEM):
+            log_debug_message(folder_path, f"Skipping {target_file_path} (emblem already applied)")
+            continue
+
+        # Validate the target file
+        validate_file_with_tracking(target_file_path, hash_file_path, folder_path)
+
+
 class HashOverlayProvider(GObject.GObject, Nautilus.InfoProvider):
     def update_file_info(self, file):
         """Update file info in Nautilus."""
@@ -164,32 +233,19 @@ class HashOverlayProvider(GObject.GObject, Nautilus.InfoProvider):
         file_path = file.get_location().get_path()
 
         # Ignore non-hash files
-        if not any(file_path.endswith(ext) for ext in HASH_FILE_EXTENSIONS):
-            # The file is not a hashfile
+        if not is_supported_hash_file(file_path):
             return
 
         folder_path = os.path.dirname(file_path)
 
         # Run hash validation in a separate thread
+        self._start_validation_thread(file_path, folder_path)
+
+    def _start_validation_thread(self, file_path, folder_path):
+        """Start a thread for validating a hash file."""
         def validate_and_process():
             log_debug_message(folder_path, f"Processing hash file: {file_path}")
-            with (open(file_path, "r") as f):
-                for line in f:
-                    try:
-                        hash_value, target_filename = line.strip().split("  ", 1)
-                        target_file_path = os.path.join(folder_path, target_filename)
-
-                        if os.path.exists(target_file_path):
-                            # Skip files that already have the emblem
-                            if is_emblem_applied(target_file_path, VERIFIED_EMBLEM
-                                                 )or is_emblem_applied(target_file_path, FAILED_EMBLEM):
-                                log_debug_message(folder_path, f"Skipping {target_file_path} (emblem already applied)")
-                                continue
-
-                            validate_file_with_tracking(target_file_path, file_path, folder_path)
-                        else:
-                            log_debug_message(folder_path, f"Target file not found: {target_filename}")
-                    except ValueError:
-                        log_debug_message(folder_path, f"Malformed line in {file_path}: {line.strip()}")
+            process_hash_file(file_path, folder_path)
 
         threading.Thread(target=validate_and_process, daemon=True).start()
+

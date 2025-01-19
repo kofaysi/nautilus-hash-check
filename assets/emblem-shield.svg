@@ -1,10 +1,108 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!-- Created with Inkscape (http://www.inkscape.org/) -->
 
-<svg width="48" height="48" viewBox="0 0 12.7 12.7" version="1.1" id="svg1" inkscape:export-filename="emblem-shield.png" inkscape:export-xdpi="96" inkscape:export-ydpi="96" inkscape:version="1.4 (e7c3feb100, 2024-10-09)" sodipodi:docname="emblem-green-check.svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape" xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
-  <sodipodi:namedview id="namedview1" pagecolor="#ffffff" bordercolor="#000000" borderopacity="0.25" inkscape:showpageshadow="2" inkscape:pageopacity="0.0" inkscape:pagecheckerboard="0" inkscape:deskcolor="#d1d1d1" inkscape:document-units="mm" inkscape:zoom="1.4859428" inkscape:cx="26.245963" inkscape:cy="63.259501" inkscape:window-width="1920" inkscape:window-height="1043" inkscape:window-x="0" inkscape:window-y="0" inkscape:window-maximized="1" inkscape:current-layer="layer1" />
-  <defs id="defs1" />
-  <g inkscape:label="Layer 1" inkscape:groupmode="layer" id="layer1">
-    <text xml:space="preserve" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.8167px;line-height:1.09em;font-family:Sans;-inkscape-font-specification:Sans;text-align:justify;text-decoration-color:#000000;letter-spacing:0px;writing-mode:lr-tb;direction:ltr;text-anchor:start;white-space:pre;opacity:1;fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:0.499999;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3;-inkscape-stroke:none" x="-0.021166639" y="11.898854" id="text1"><tspan sodipodi:role="line" id="tspan1" style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:14.8167px;font-family:Sans;-inkscape-font-specification:Sans;fill:#00ff00;fill-opacity:1;stroke:none;stroke-width:0.499999" x="-0.021166639" y="11.898854">🛡</tspan></text>
+<svg
+   width="48"
+   height="48"
+   viewBox="0 0 12.7 12.7"
+   version="1.1"
+   id="svg1"
+   inkscape:export-filename="emblem-shield.png"
+   inkscape:export-xdpi="96"
+   inkscape:export-ydpi="96"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   sodipodi:docname="emblem-shield.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     inkscape:zoom="4.2028809"
+     inkscape:cx="121.94017"
+     inkscape:cy="46.158815"
+     inkscape:window-width="1920"
+     inkscape:window-height="1043"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="g3">
+    <inkscape:page
+       x="0"
+       y="0"
+       width="12.7"
+       height="12.7"
+       id="page1"
+       margin="0"
+       bleed="0"
+       inkscape:export-filename="emblem-hash-error.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+    <inkscape:page
+       x="22.700001"
+       y="0"
+       width="12.7"
+       height="12.7"
+       id="page2"
+       margin="0"
+       bleed="0"
+       inkscape:export-filename="emblem-hash-error.png"
+       inkscape:export-xdpi="96"
+       inkscape:export-ydpi="96" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.7px;line-height:1.09em;font-family:Sans;-inkscape-font-specification:Sans;text-align:justify;text-decoration-color:#000000;letter-spacing:0px;writing-mode:lr-tb;direction:ltr;text-anchor:start;white-space:pre;opacity:1;fill:#00ff00;fill-opacity:1;stroke:#00ff00;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
+       x="0.889"
+       y="11.10615"
+       id="text1"
+       inkscape:label="shield-green-fill"><tspan
+         sodipodi:role="line"
+         id="tspan1"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.7px;font-family:Sans;-inkscape-font-specification:Sans;fill:#00ff00;fill-opacity:1;stroke:#00ff00;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"
+         x="0.889"
+         y="11.10615">🛡</tspan></text>
+    <g
+       id="g3"
+       transform="translate(1.120657,-0.81431564)">
+      <text
+         xml:space="preserve"
+         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.7px;line-height:1.09em;font-family:Sans;-inkscape-font-specification:Sans;text-align:justify;text-decoration-color:#000000;letter-spacing:0px;writing-mode:lr-tb;direction:ltr;text-anchor:start;white-space:pre;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:1;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:3;stroke-dasharray:none;stroke-opacity:1"
+         x="22.468344"
+         y="11.920465"
+         id="text1-5"
+         inkscape:label="shield-red-stroke"><tspan
+           sodipodi:role="line"
+           id="tspan1-3"
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:12.7px;font-family:Sans;-inkscape-font-specification:Sans;fill:#ffffff;fill-opacity:1;stroke:#ff0000;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"
+           x="22.468344"
+           y="11.920465">🛡</tspan></text>
+      <text
+         xml:space="preserve"
+         style="font-size:11.2889px;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:none;stroke:#00ff00;stroke-width:1;stroke-dasharray:none;stroke-opacity:1"
+         x="24.922461"
+         y="11.353556"
+         id="text2"
+         inkscape:label="question-mark"><tspan
+           sodipodi:role="line"
+           id="tspan2"
+           style="font-size:11.2889px;fill:#ff003b;fill-opacity:1;stroke:none;stroke-width:1"
+           x="24.922461"
+           y="11.353556">?</tspan></text>
+    </g>
   </g>
 </svg>
